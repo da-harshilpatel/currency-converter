@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Currency Converter Section -->
+        <div class="converter">
+            <h2>Currency Converter</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div>
+                    <label for="source_amount">Amount:</label>
+                    <input type="number" id="source_amount" name="source_amount" value="{{ source_amount }}" required>
+                </div>
+                <div>
+                    <label for="source_currency">Source Currency:</label>
+                    <select id="source_currency" name="source_currency" required>
+                        {% for currency in currencies %}
+                            <option value="{{ currency }}" {% if source_currency == currency %}selected{% endif %}>
+                                {{ currency }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="dest_currency">Destination Currency:</label>
+                    <select id="dest_currency" name="dest_currency" required>
+                        {% for currency in currencies %}
+                            <option value="{{ currency }}" {% if dest_currency == currency %}selected{% endif %}>
+                                {{ currency }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="red-button">Convert</button>
+                </div>
+            </form>
+            {% if converted_amount %}
+                <div class="converted-box">
+                <h3>Converted Amount</h3>
+            <p>{{ converted_amount }}</p>
+                </div>
+            {% endif %}
+
+            <!-- Top Gainers and Losers Tables -->
+            <div class="tables">
+                <h3>Top 5 Gainers</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th>Rate Change (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in top_gain %}
+                        <tr>
+                            <td>{{ row.Currency }}</td>
+                            <td>{{ row.change_rate }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h3>Top 5 Losers</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th>Rate Change (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in top_loss %}
+                        <tr>
+                            <td>{{ row.Currency }}</td>
+                            <td>{{ row.change_rate }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts">
+            <div class="chart historical-trend">
+                <h3>Historical Trends</h3>
+                {% if chart_html %}
+                    <div>{{ chart_html|safe }}</div>
+                {% else %}
+                    <p>Please select currencies and select convert.</p>
+                {% endif %}
+            </div>
+            <div class="chart forecast">
+                <h3>Forecast for Next 30 Days</h3>
+                {% if forecast_html %}
+                    <div>{{ forecast_html|safe }}</div>
+                {% else %}
+                    <p>Please select currencies and select convert.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
