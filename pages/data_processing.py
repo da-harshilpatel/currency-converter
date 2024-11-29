@@ -7,7 +7,8 @@ import plotly.express as px
 from prophet import Prophet
 
 cache = {
-    "data": None
+    "data": None,
+    "lastFetchDate": None
 }
 
 def getdate():
@@ -37,12 +38,14 @@ def url_builder():
 
 def get_cached_data():
     global cache
-    if cache['data'] is not None:
-        return cache['data']    
-    else:
+    current_date = datetime.today().date()
+    if cache['data'] is None or cache['lastFetchDate'] < current_date:
         df = transform_data()
         cache['data'] = df
-        return df
+        cache['lastFetchDate'] = current_date
+        return df   
+    else:
+        return cache['data']
 
 
 def transform_data():
